@@ -1,16 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body style="background: yellow;">
-<div style="background-color: black; color:white; width:100%; height: 200px;">
-    <h1>Закажите 3 блюда и получите натуральный сок в подарок!<br> Доставка бесплатно!</h1>
-</div>
+{% extends 'header.html' %}
+{% block content %}
+    {% for dish in dishes %}
+        <div class="dish_cart">
+            <h3>Название блюда: {{ dish.title }} </h3>
 
-</body>
-</html>
+            <p>
+                {% for category in dish.categories.all %}
+                    {{ category.title }},
+                {% endfor %}
+            </p>
+            <p>Описание: {{ dish.description }}</p>
+        </div>
+{% endfor %}
+{% endblock %}
+
+

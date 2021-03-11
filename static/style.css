@@ -1,0 +1,22 @@
+body {
+    background: url("static/Yellow.jpg") no-repeat fixed;
+    background-size: cover;
+    transition: 3s;
+}
+
+.dish_cart img {
+
+    width: 120px
+}
+.card-img:hover{
+    transform: scale(1.2,1.2);
+}
+
+
+.title{
+    font-size:50px;
+    color: yellow;
+
+.dish_cart img{
+    width:120px;
+}

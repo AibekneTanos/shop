@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-
+import _locale
+_locale._getdefaultlocale = (lambda *args: ['en_US', 'utf8'])
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,6 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '_94ju_s)ampfems#eyk9cnou!ws!$@&e_9wi-zwr$18cxi6wl8'
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "78726045847-jjnm3tq5mk0u7v87mjdejkll1bi88s7g.apps.googleusercontent.com"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "gCo603kWtbkEBY96jlhU3wgk"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -38,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shop',
+    'social_django',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -59,10 +65,13 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.media',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -75,15 +84,23 @@ WSGI_APPLICATION = 'my.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default':{
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'NAME': 'Dish',
+        'PASSWORD': '0551101907',
+        'HOST': 'localhost',
+        'PORT': '5432',
+
+     }
 }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -114,10 +131,22 @@ USE_L10N = True
 
 USE_TZ = True
 
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+LOGIN_URL = 'login/google-oauth2/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static/']
 STATIC_ROOT = '/static'
-STATIC_DIRS = ['static/']
+STATIC_URL = '/static/'
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+ADMIN_MEDIA_PREFIX = '/static/admin/'
