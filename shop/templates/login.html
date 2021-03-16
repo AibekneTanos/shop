@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
-
+{% load static %}
 {% block content %}
-    <link rel="stylesheet" href="/static/login.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <section class="login">
         <form method="post">
             <h3>{{ auth_header }}</h3>

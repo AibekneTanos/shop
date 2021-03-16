@@ -6,7 +6,7 @@ from .models import Dish
 class EditForm(forms.ModelForm):
     class Meta:
         model = Dish
-        fields = ('title', 'dish_type', 'description', 'image', 'price')
+        fields = ('title', 'dish_type', 'description', 'price')
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(max_length=254, help_text='Обязательное поле')

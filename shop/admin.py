@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Dish, Category, Company, Cart, CartContent
-
+from .models import Dish, Company, Cart, CartContent, Category
 
 admin.site.register(Category)
 admin.site.register(Company)
@@ -13,4 +12,6 @@ admin.site.register(CartContent)
 
 @admin.register(Dish)
 class DishAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'get_categories' , 'dish_type']
+    list_display = ['id', 'title', 'dish_type', 'price']
+
+

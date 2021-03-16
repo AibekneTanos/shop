@@ -1,7 +1,6 @@
-
 {% extends 'index.html' %}
 {% block content %}
-    {% include 'header.html' %}
+
     <div class="row justify-content-sm-start mx-0 ">
         {% for dish in dishes %}
             <div class="card offset-1 col-3 mt-4 p-2" id="dish-{{ dish.id }}">
@@ -12,7 +11,6 @@
                     <a href="#" class="btn btn-primary">Перейти к блюду</a>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">коспания: {{ dish.company }}</li>
                     <li class="list-group-item">цена: {{ dish.price }}</li>
                     <li class="list-group-item">категории: {{ dish.get_categories }}</li>
                 </ul>
@@ -28,4 +26,3 @@
         {% endfor %}
     </div>
 {% endblock %}
-

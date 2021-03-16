@@ -4,12 +4,14 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+
 class Company(models.Model):
+
     title = models.CharField(max_length=250)
 
-def __str__(self):
+    def __str__(self):
 
-    return self.title
+        return self.title
 
 
 class Category(models.Model):
@@ -18,22 +20,12 @@ class Category(models.Model):
     description = models.CharField(max_length=500, verbose_name='Описание')
 
     # возвращение дефолтного значения при обращении к обьекту
-
     def __str__(self):
-         return self.title
-
-
-
+        return self.title
 
     class Meta:
-           verbose_name = "Категория"
-           verbose_name_plural = "Категории"
-
-
-
-
-
-
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
 
 class Dish(models.Model):
@@ -42,18 +34,16 @@ class Dish(models.Model):
     dish_type = models.CharField(max_length=100, verbose_name='Тип блюда')
     description = models.CharField(max_length=500, verbose_name='Описание')
     categories = models.ManyToManyField(Category, verbose_name='категория', )
-    company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True)
+    # company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True)
     price = models.PositiveIntegerField(verbose_name='цена')
 
-    def get_categories(self):
-        return ', '.join([cat.title for cat in self.categories.all()])
-
-    get_categories.short_description = "Категории"
+    # def get_categories(self):
+    #     return ', '.join([cat.title for cat in self.categories.all()])
+    #
+    # get_categories.short_description = "Категории"
 
     def __str__(self):
         return self.title
-
-
 
     class Meta:
         verbose_name = "Блюдо"

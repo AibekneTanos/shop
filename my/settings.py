@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'my.wsgi.application'
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'Dish',
+        'NAME': 'food_shop',
         'PASSWORD': '0551101907',
         'HOST': 'localhost',
         'PORT': '5432',

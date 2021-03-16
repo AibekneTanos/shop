@@ -6,17 +6,6 @@ from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.postgres.search import SearchVector
 
-
-def view_category(request):
-    category_id = request.GET.get("category_id")
-    category = Category.objects.filter(id=category_id)
-    return render(request, 'category.html', {'category': category})
-
-
-
-
-
-
 class MasterView(View):
 
     def get_cart_records(self, cart=None, response=None):
@@ -32,6 +21,30 @@ class MasterView(View):
 
         return cart_records
 
+    def get_cart(self):
+        if self.request.user.is_authenticated:
+            user_id = self.request.user.id
+            try:
+                cart = Cart.objects.get(user_id=user_id)
+            except ObjectDoesNotExist:
+                cart = Cart(user_id=user_id,
+                            total_cost=0)
+                cart.save()
+
+
+
+        else:
+            session_key = self.request.session.session_key
+            if not session_key:
+                self.request.session.save()
+                session_key = self.request.session.session_key
+            try:
+                cart = Cart.objects.get(session_key=session_key)
+            except ObjectDoesNotExist:
+                cart = Cart(session_key=session_key,
+                            total_cost=0)
+                cart.save()
+        return cart
 
 
 class HomeView(MasterView):
@@ -57,6 +70,41 @@ class HomeView(MasterView):
                       {'dishes': self.all_dishes, 'form': form, 'user': request.user})
 
 
+def view_category(request):
+    category_id = request.GET.get("category_id")
+    category = Category.objects.filter(id=category_id)
+    return render(request, 'category.html', {'category': category})
+
+class CartView(MasterView):
+    def get(self, request):
+        cart = self.get_cart()
+        cart_records = self.get_cart_records(cart)
+        cart_total = cart.get_total() if cart else 0
+
+        context = {
+            'cart_records': cart_records,
+            'cart_total': cart_total,
+        }
+        return render(request, 'cart.html', context)
+
+    def post(self, request):
+        dish = Dish.objects.get(id=request.POST.get('dish_id'))
+        cart = self.get_cart()
+        quantity = request.POST.get('qty')
+        # get_or_create - найдет обьект, если его нет в базе, то создаст
+        # первый параметр - обьект, второй - булевое значение которое сообщает создан ли обьект
+        # если обьект создан, то True, если он уже имеется в базе, то False
+        cart_content, _ = CartContent.objects.get_or_create(cart=cart, product=dish)
+        cart_content.qty = quantity
+        cart_content.save()
+        response = self.get_cart_records(cart, redirect('/#dish-{}'.format(dish.id)))
+        return response
+        # перенаправляем на главную страницу, с учетом якоря
+
+
+
+
+
 def log_in(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -64,17 +112,19 @@ def log_in(request):
             username = form.cleaned_data['login']
             password = form.cleaned_data['password']
             user = authenticate(username=username, password=password)
+            login(request, user, backend='games.backend.UsernameAuthBackend')
+
             if user:
                 login(request, user)
+
                 return redirect('/')
             else:
                 form.add_error('login', 'Bad login or password')
                 form.add_error('password', 'Bad login or password')
-                return render(request, 'login.html', {'form': form})
     else:
         form = LoginForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', {'form': form, 'submit_text': 'Войти', 'auth_header': 'Вход'})
 
 
 def register(request):
@@ -84,7 +134,8 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = True
             user.save()
-            login(request, user)
+
+            login(request, user, backend='games.backend.UsernameAuthBackend')
             return redirect('/')
     else:
         form = RegisterForm()
@@ -107,53 +158,6 @@ def edit_dish(request):
             return redirect('/')
     else:
         form = EditForm
-        return render(request, 'edit.html', {'dishes': all_dishes,'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение блюда'})
+        return render(request, 'edit.html', {'dishes': all_dishes, 'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение блюда'})
 
 
-def get_cart(self):
-    if self.request.user.is_authenticad:
-        user_id = self.request.user.id
-        try:
-            cart = Cart.objects.get(user_id=user_id)
-        except ObjectDoesNotExist:
-            cart = Cart(user_id=user_id,
-                        total_cost=0)
-            cart.save()
-    else:
-        session_key = self.request.session.session_key
-        if not session_key:
-            self.request.session.save()
-            session_key = self.request.session_key
-        try:
-            cart = Cart.objects.get(session_key)
-        except ObjectDoesNotExist:
-            cart = Cart(session_key=session_key,
-                        total_cost=0)
-            cart.save()
-        return cart
-
-
-class CartView(MasterView):
-    def get(self, request):
-        cart = self.get_cart()
-        cart_records = self.get_cart_records(cart)
-        cart_total = cart.get_total() if cart else 0
-
-        context = {
-            'cart_records': cart_records,
-            'cart_total': cart_total,
-        }
-        return render(request, 'cart.html', context)
-
-def post(self, request):
-        dish = Dish.objects.get(id=request.POST.get('dish_id'))
-        cart = self.get_cart()
-        quantity = request.POST.get('qty')
-        # get_or_create - найдет обьект, если его нет в базе, то создаст
-        # первый параметр - обьект, второй - булевое значение которое сообщает создан ли обьект
-        # если обьект создан, то True, если он уже имеется в базе, то False
-        cart_content, _ = CartContent.objects.get_or_create(cart=cart, product=dish)
-        cart_content.qty = quantity
-        cart_content.save()
-        response = self.get_cart_records(cart, redirect('/#dish-{}'.format(dish.id)))
-        return response

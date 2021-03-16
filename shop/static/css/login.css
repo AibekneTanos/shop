@@ -1,5 +1,5 @@
 body{
-        background: red;
+        min-height: 95vh;
 }
 body ,form {
     display: flex;
@@ -9,10 +9,10 @@ body ,form {
 }
 
 section {
-    background: aquamarine;
+    background: pink;
     width: 400px;
     padding: 40px;
-    border-radius: 5%;
+    border-radius: 10%;
 
 }
 
