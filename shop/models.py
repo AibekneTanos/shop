@@ -34,13 +34,13 @@ class Dish(models.Model):
     dish_type = models.CharField(max_length=100, verbose_name='Тип блюда')
     description = models.CharField(max_length=500, verbose_name='Описание')
     categories = models.ManyToManyField(Category, verbose_name='категория', )
-    # company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True)
     price = models.PositiveIntegerField(verbose_name='цена')
 
-    # def get_categories(self):
-    #     return ', '.join([cat.title for cat in self.categories.all()])
-    #
-    # get_categories.short_description = "Категории"
+    def get_categories(self):
+        return ', '.join([cat.title for cat in self.categories.all()])
+
+    get_categories.short_description = "Категории"
 
     def __str__(self):
         return self.title
@@ -73,6 +73,13 @@ class Cart(models.Model):
         for item in items:
             total += item.product.price * item.qty
         return total
+
+
+    def get_cart_content(self):
+        item = CartContent.objects.all()
+        return item
+
+
 
 
 class CartContent(models.Model):

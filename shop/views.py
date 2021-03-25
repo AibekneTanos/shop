@@ -32,7 +32,6 @@ class MasterView(View):
                 cart.save()
 
 
-
         else:
             session_key = self.request.session.session_key
             if not session_key:
@@ -56,6 +55,7 @@ class HomeView(MasterView):
                       {'dishes': self.all_dishes, 'form': form})
 
     def post(self, request):
+
         form = SearchForm(request.POST)
         search = request.POST.get('search')
         if form.is_valid() and search:
@@ -64,6 +64,7 @@ class HomeView(MasterView):
                                          'categories__title',
                                          'company__title', )
             self.all_dishes = self.all_dishes.annotate(search=search_vector).filter(search=search)
+
         else:
             form = SearchForm()
         return render(request, 'base.html',
@@ -103,8 +104,6 @@ class CartView(MasterView):
 
 
 
-
-
 def log_in(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -129,14 +128,18 @@ def log_in(request):
 
 def register(request):
     if request.method == 'POST':
+
+
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = True
             user.save()
 
-            login(request, user, backend='games.backend.UsernameAuthBackend')
-            return redirect('/')
+
+        login(request, user, backend='games.backend.UsernameAuthBackend')
+        return redirect('/')
+
     else:
         form = RegisterForm()
     return render(request, 'registr.html', {'form': form})

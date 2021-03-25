@@ -12,6 +12,6 @@ admin.site.register(CartContent)
 
 @admin.register(Dish)
 class DishAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'dish_type', 'price']
+    list_display = ['id', 'title', 'dish_type', 'price', ]
 
 

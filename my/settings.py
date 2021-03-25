@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop',
     'social_django',
-    
+    'rest_framework',
+    'rest_shop',
     
 ]
 
