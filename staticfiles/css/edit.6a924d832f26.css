@@ -1,0 +1,21 @@
+body{
+    min-height: 95vh;
+}
+
+body, form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+section{
+    background: green;
+    width: 400px;
+    padding: 40px;
+    border-radius: 10%;
+}
+
+label, input{
+    display: black;
+}

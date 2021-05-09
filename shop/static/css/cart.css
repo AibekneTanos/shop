@@ -1,0 +1,19 @@
+
+
+body ,form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+section {
+    background: pink;
+    color: red;
+    width: 500px;
+    padding: 50px;
+    border-radius: 10%;
+
+}
+
+

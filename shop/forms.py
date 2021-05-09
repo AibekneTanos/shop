@@ -1,17 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Dish
+from .models import Dish, Location, UserProfile
+
 
 class EditForm(forms.ModelForm):
+    user = forms.CharField(max_length=150)
+    description = forms.CharField(max_length=150)
+    locations = forms.ChoiceField(choices=Location)
+
     class Meta:
-        model = Dish
-        fields = ('title', 'dish_type', 'description', 'price')
+        model = UserProfile
+        fields = ("locations", "user")
+
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(max_length=254, help_text='Обязательное поле')
     # поле почты проходит валидацию иначе чем CharField
-
+    email = forms.CharField(widget=forms.EmailInput, max_length=254, help_text='Обязательное поле.', required=False)
     # пароль также проходит валидацию и по умолчанию к нему применяются довольно строгие правила
     # но тут указывается тип поля уже с помощью аргумента widget
     password1 = forms.CharField(widget=forms.PasswordInput, max_length=254, help_text='')

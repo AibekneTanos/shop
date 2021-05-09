@@ -1,10 +1,16 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
-from .models import Dish, Category, Cart, CartContent
+from .models import Dish, Category, Cart, CartContent, Kit, UserProfile
 from .forms import SearchForm, LoginForm, RegisterForm, EditForm
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.postgres.search import SearchVector
+from django.views.generic import ListView
+
+
+
+
 
 class MasterView(View):
 
@@ -30,6 +36,8 @@ class MasterView(View):
                 cart = Cart(user_id=user_id,
                             total_cost=0)
                 cart.save()
+        
+
 
 
         else:
@@ -39,6 +47,7 @@ class MasterView(View):
                 session_key = self.request.session.session_key
             try:
                 cart = Cart.objects.get(session_key=session_key)
+
             except ObjectDoesNotExist:
                 cart = Cart(session_key=session_key,
                             total_cost=0)
@@ -46,13 +55,27 @@ class MasterView(View):
         return cart
 
 
+
 class HomeView(MasterView):
     all_dishes = Dish.objects.all()
 
     def get(self, request):
+        paginator = Paginator(self.all_dishes, 2)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        index = paginator.page_range.index(page_obj.number)
+        max_index = len(paginator.page_range)
+        start_index = index - 3 if index >= 3 else 0
+        end_index = index + 3 if index <= max_index - 3 else max_index
+        page_range = paginator.page_range[start_index:end_index]
+
+        profile = None
+
+        if request.user.is_authenticated:
+            profile = UserProfile.objects.filter(user=request.user).first()
         form = SearchForm()
         return render(request, 'base.html',
-                      {'dishes': self.all_dishes, 'form': form})
+                      {'dishes': page_obj, 'page_range': page_range, 'form': form, 'profile': profile})
 
     def post(self, request):
 
@@ -152,15 +175,16 @@ def logouts(request):
 
 
 
-def edit_dish(request):
-    all_dishes = Dish.objects.all()
-    if request.method =='POST':
-        form = EditForm(request.POST)
+
+
+
+
+def edit_profile(request):
+    if request.method == 'POST':
+        form = EditForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('/')
     else:
-        form = EditForm
-        return render(request, 'edit.html', {'dishes': all_dishes, 'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение блюда'})
-
-
+        form = EditForm(instance=request.user)
+    return render(request, 'edit.city.html', {'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение профиля'})

@@ -16,36 +16,20 @@ class CategorySerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['title']
+        fields = ['title', 'id']
 
 
 
 
 
 class DishSerializer(serializers.ModelSerializer):
-    # categories = CategorySerializer(many=True)
-    # company = CompanySerializer(required=False)
-    depth = 2
 
-    class Meta:
-        model = Dish
-        fields = '__all__'
+   categories = CategorySerializer(many=True)
+   company = CompanySerializer(required=False)
 
-    def create(self, validated_data):
-        categories = validated_data.pop("categories", [])
-        instance = Dish.objects.create(**validated_data)
-        for category in categories:
-            instance.categories.add(category)
-        instance.save()
-        return instance
-
-    def update(self, instance, validated_data):
-        categories = validated_data.pop("categories", [])
-        instance = super().update(instance, validated_data)
-        for category in categories:
-            instance.categories.add(category)
-        instance.save()
-        return instance
+   class Meta:
+       model = Dish
+       fields = '__all__'
 
 
 
@@ -78,7 +62,7 @@ class CartContentSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer
-    #cart_content = CartContentSerializer(source='get_cart_content', many=True)
+    cart_content = CartContentSerializer(source='get_cart_content', many=True)
     depth = 1
 
     class Meta:
@@ -88,7 +72,3 @@ class CartSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         carts = validated_data.pop('carts', [])
         instance = Cart.objects.create(**validated_data)
-        for carts in Cart:
-            instance.carts.add(cart_content)
-        instance.save()
-        return instance

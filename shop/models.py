@@ -1,13 +1,34 @@
-
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import User
-
 # Create your models here.
+
+
+
+class Location(models.Model):
+    country = models.CharField(max_length=150, blank=True)
+
+
+
+    def __str__(self):
+        return self.country
+
+
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    description = models.TextField(blank=True, null=True)
+    locations = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.user.username
+
 
 
 class Company(models.Model):
 
-    title = models.CharField(max_length=250)
+    title = models.CharField(max_length=15)
+
 
     def __str__(self):
 
@@ -34,8 +55,13 @@ class Dish(models.Model):
     dish_type = models.CharField(max_length=100, verbose_name='Тип блюда')
     description = models.CharField(max_length=500, verbose_name='Описание')
     categories = models.ManyToManyField(Category, verbose_name='категория', )
-    company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True, default=2)
     price = models.PositiveIntegerField(verbose_name='цена')
+
+
+
+
+
 
     def get_categories(self):
         return ', '.join([cat.title for cat in self.categories.all()])
@@ -51,12 +77,6 @@ class Dish(models.Model):
 
 
 
-class Logins(models.Model):
-    your_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.last_name
 
 
 class Cart(models.Model):
@@ -86,3 +106,22 @@ class CartContent(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Dish, on_delete=models.CASCADE)
     qty = models.PositiveIntegerField(null=True)
+
+
+class Kit(models.Model):
+    total_before = models.PositiveIntegerField(default=0)
+    total_after = models.PositiveIntegerField(default=0)
+    items = models.ManyToManyField(Dish)
+    percent = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(99)])
+
+
+
+
+
+    def __str__(self):
+        return str(self.id)
+
+
+
+
+
