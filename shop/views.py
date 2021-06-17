@@ -9,25 +9,23 @@ from django.contrib.postgres.search import SearchVector
 from django.views.generic import ListView
 
 
-
-
-
 class MasterView(View):
 
     def get_cart_records(self, cart=None, response=None):
         cart = self.get_cart() if cart is None else cart
-        if cart is not None:
+        if cart is not None and self.request.user.is_authenticated:
             cart_records = CartContent.objects.filter(cart_id=cart.id)
         else:
             cart_records = []
 
         if response:
             response.set_cookie('cart_count', len(cart_records))
+
             return response
 
         return cart_records
 
-    def get_cart(self):
+    def get_cart(self, response=None):
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
             try:
@@ -36,10 +34,6 @@ class MasterView(View):
                 cart = Cart(user_id=user_id,
                             total_cost=0)
                 cart.save()
-        
-
-
-
         else:
             session_key = self.request.session.session_key
             if not session_key:
@@ -47,12 +41,15 @@ class MasterView(View):
                 session_key = self.request.session.session_key
             try:
                 cart = Cart.objects.get(session_key=session_key)
-
             except ObjectDoesNotExist:
                 cart = Cart(session_key=session_key,
                             total_cost=0)
-                cart.save()
+
         return cart
+
+    def get_new_cart(self, response):
+        if self.request.user.is_authenticated:
+            session_key = self.request.session.session_key
 
 
 
@@ -99,17 +96,18 @@ def view_category(request):
     category = Category.objects.filter(id=category_id)
     return render(request, 'category.html', {'category': category})
 
+
 class CartView(MasterView):
     def get(self, request):
-        cart = self.get_cart()
-        cart_records = self.get_cart_records(cart)
-        cart_total = cart.get_total() if cart else 0
+            cart = self.get_cart()
+            cart_records = self.get_cart_records(cart)
+            cart_total = cart.get_total() if cart else 0
 
-        context = {
-            'cart_records': cart_records,
-            'cart_total': cart_total,
-        }
-        return render(request, 'cart.html', context)
+            context = {
+                'cart_records': cart_records,
+                'cart_total': cart_total,
+            }
+            return render(request, 'cart.html', context)
 
     def post(self, request):
         dish = Dish.objects.get(id=request.POST.get('dish_id'))
@@ -121,10 +119,10 @@ class CartView(MasterView):
         cart_content, _ = CartContent.objects.get_or_create(cart=cart, product=dish)
         cart_content.qty = quantity
         cart_content.save()
+
         response = self.get_cart_records(cart, redirect('/#dish-{}'.format(dish.id)))
         return response
         # перенаправляем на главную страницу, с учетом якоря
-
 
 
 def log_in(request):
@@ -134,7 +132,7 @@ def log_in(request):
             username = form.cleaned_data['login']
             password = form.cleaned_data['password']
             user = authenticate(username=username, password=password)
-            login(request, user, backend='games.backend.UsernameAuthBackend')
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
             if user:
                 login(request, user)
@@ -151,15 +149,11 @@ def log_in(request):
 
 def register(request):
     if request.method == 'POST':
-
-
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = True
             user.save()
-
-
         login(request, user, backend='games.backend.UsernameAuthBackend')
         return redirect('/')
 
@@ -168,15 +162,9 @@ def register(request):
     return render(request, 'registr.html', {'form': form})
 
 
-
 def logouts(request):
     logout(request)
     return redirect('/')
-
-
-
-
-
 
 
 def edit_profile(request):
@@ -187,4 +175,6 @@ def edit_profile(request):
             return redirect('/')
     else:
         form = EditForm(instance=request.user)
-    return render(request, 'edit.city.html', {'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение профиля'})
+    return render(request, 'edit.html', {'form': form, 'submit_text': 'Изменить', 'auth_header': 'Изменение профиля'})
+
+

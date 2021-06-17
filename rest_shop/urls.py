@@ -1,14 +1,13 @@
 from django.urls import include, path
 from rest_framework import routers
 from rest_shop import views
-
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'companies', views.CompanyViewSet)
 router.register(r'carts', views.CartViewSet)
 router.register(r'dishes', views.DishViewSet)
-router.register(r'cartcontent', views.CartContentViewSet)
+router.register(r'cartContents', views.CartContentViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

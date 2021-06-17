@@ -1,14 +1,10 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
-
 
 
 class Location(models.Model):
     country = models.CharField(max_length=150, blank=True)
-
-
 
     def __str__(self):
         return self.country
@@ -24,11 +20,9 @@ class UserProfile(models.Model):
         return self.user.username
 
 
-
 class Company(models.Model):
 
-    title = models.CharField(max_length=15)
-
+    title = models.CharField(max_length=150)
 
     def __str__(self):
 
@@ -54,13 +48,9 @@ class Dish(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название блюда', help_text='Введите название блюда')
     dish_type = models.CharField(max_length=100, verbose_name='Тип блюда')
     description = models.CharField(max_length=500, verbose_name='Описание')
-    categories = models.ManyToManyField(Category, verbose_name='категория', )
+    categories = models.ManyToManyField(Category, verbose_name='категория')
     company = models.ForeignKey(Company, verbose_name='компания', on_delete=models.SET_NULL, null=True, default=2)
     price = models.PositiveIntegerField(verbose_name='цена')
-
-
-
-
 
 
     def get_categories(self):
@@ -74,9 +64,6 @@ class Dish(models.Model):
     class Meta:
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
-
-
-
 
 
 class Cart(models.Model):
@@ -94,12 +81,9 @@ class Cart(models.Model):
             total += item.product.price * item.qty
         return total
 
-
     def get_cart_content(self):
         item = CartContent.objects.all()
         return item
-
-
 
 
 class CartContent(models.Model):
@@ -113,10 +97,6 @@ class Kit(models.Model):
     total_after = models.PositiveIntegerField(default=0)
     items = models.ManyToManyField(Dish)
     percent = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(99)])
-
-
-
-
 
     def __str__(self):
         return str(self.id)

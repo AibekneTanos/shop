@@ -9,8 +9,7 @@ urlpatterns = [
     path('registr/', views.register, name="registr"),
     path('logouts/', views.logouts, name='logouts'),
     path('cart/', views.CartView.as_view(), name='cart'),
-    path('edit/', views.edit_profile, name="edit")
-
+    path('edit/', views.edit_profile, name="edit"),
 
 ]
 

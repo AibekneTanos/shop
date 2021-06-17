@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,11 +45,21 @@ INSTALLED_APPS = [
     'shop.apps.ShopConfig',
     'social_django',
     'rest_framework',
+    'djoser',
+    'rest_framework.authtoken',
     'rest_shop',
-    
 ]
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.TokenAuthentication',
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+#
+# }
+
 
 MIDDLEWARE = [
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -126,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -135,6 +146,18 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+LANGUAGES = (
+    ('ru', 'Russian'),
+    ('uk', 'Ukrainian'),
+)
+
+LOCALE_PATHS = (
+    'locale',
+    # os.path.join(PROJECT_DIR, 'locale'),
+)
+
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 LOGIN_URL = 'login/google-oauth2/'
@@ -157,5 +180,8 @@ MEDIA_ROOT = BASE_DIR / 'shop/media'
 ADMIN_MEDIA_PREFIX = 'static/admin/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+
 
 django_heroku.settings(locals())

@@ -1,16 +1,16 @@
+from cart import cart
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save, m2m_changed, pre_save
 from django.dispatch import receiver
-from shop.models import UserProfile, Kit, Dish, Company
-
-
+from shop.models import UserProfile, Kit, Dish, Company, CartContent
 
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
+
 
 @receiver(post_save, sender=Dish.company)
 def create_dish(instance, **kwargs):
@@ -43,3 +43,7 @@ def create_kit(instance, **kwargs):
 
 
 m2m_changed.connect(create_kit, sender=Kit.items.through)
+
+
+
+
